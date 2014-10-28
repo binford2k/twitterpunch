@@ -1,0 +1,82 @@
+#! /usr/bin/env ruby
+
+require 'rubygems'
+require 'twitter'
+require 'optparse'
+require "net/http"
+require 'yaml'
+
+require 'twitterpunch'
+
+configfile = File.expand_path('~/.twitterpunch.yaml')
+config     = YAML.load_file(configfile) rescue {}
+
+optparse = OptionParser.new { |opts|
+  opts.banner = "Usage : twitterpunch [--debug] [--stream] [--install] [--version] [filename]
+
+    Twitterpunch is designed to work with PhotoBooth and OS X Folder Actions.
+    When this script is called with the name of an image file, it will post the
+    image to Twitter, along with a randomly chosen message and a hashtag.
+
+    If you call the script with the --stream argument instead, it will listen
+    for tweets to that hashtag and download them to a specified directory. If
+    the tweet came from another user, Twitterpunch will speak it aloud.
+
+"
+
+  opts.on("-d", "--debug", "Choose an alternate provisioning backend.") do
+    config[:debug] = true
+  end
+
+  opts.on("-s", "--stream", "Stream tweets from the specified hashtag.") do
+    config[:action] = :stream
+  end
+
+  opts.on("-g", "--genconfig", "Create a default configuration file.") do
+    config[:action] = :configure
+  end
+
+  opts.on("-i", "--install", "Install the Folder Action workflow (OS X only).") do
+    config[:action] = :install
+  end
+
+  opts.on("-v", "--version", "Display version information.") do
+    puts "Twitterpunch v#{Twitterpunch::VERSION}"
+    exit 0
+  end
+
+  opts.separator('')
+
+  opts.on("-h", "--help", "Displays this help") do
+    puts opts
+    exit
+  end
+}
+optparse.parse!
+
+config[:resources] = File.expand_path("#{File.dirname(__FILE__)}/../resources")
+config[:action] = :post if ARGV.size > 0 and config[:action].nil?
+
+case config[:action]
+when :stream
+  require 'twitterpunch/streamer'
+  client = Twitterpunch::Streamer.new(config)
+  client.stream
+
+when :post
+  require 'twitterpunch/poster'
+  client = Twitterpunch::Poster.new(config)
+  client.post(ARGV)
+
+when :configure
+  require 'twitterpunch/configuration'
+  cfg = Twitterpunch::Configuration.new(configfile).save
+  puts "Please edit #{configfile} to configure."
+
+when :install
+  system('open', "#{config[:resources]}/Twitterpunch.workflow")
+
+else
+  puts "Run twitterpunch --help for usage."
+  exit 1
+end
