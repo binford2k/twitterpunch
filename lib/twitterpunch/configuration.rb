@@ -60,7 +60,6 @@ module Twitterpunch
         :handle    => "fassford",
         :photodir  => "~/Pictures/twitterpunch/",
         :logfile   => '/var/log/twitterpunch',
-        :sendsound => "/System/Library/PrivateFrameworks/ToneLibrary.framework/Versions/A/Resources/AlertTones/tweet_sent.caf",
       }
     end
   end
