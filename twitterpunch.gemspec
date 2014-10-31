@@ -22,6 +22,20 @@ Gem::Specification.new do |s|
   s.add_dependency      "twitter"
   s.add_dependency      "oauth"
   s.add_dependency      "colorize"
+  s.add_dependency      "rubygame"
 
   s.description       = File.read(File.join(File.dirname(__FILE__), 'README.md'))
+
+  s.post_install_message = <<-desc
+
+  ************************************************************************
+  Be aware that RubyGame is BROKEN on OSX right now. You will need this
+  patch before Twitterpunch will work properly:
+
+  https://github.com/xrs1133/ruby-sdl-ffi/commit/0b721ac4659b4c08cda5aa2f418561a8a311e85b
+
+  ************************************************************************
+
+  desc
+
 end

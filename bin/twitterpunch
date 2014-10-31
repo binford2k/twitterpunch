@@ -32,6 +32,10 @@ optparse = OptionParser.new { |opts|
     config[:action] = :stream
   end
 
+  opts.on("--view", "Run photo viewer only.") do
+    config[:action] = :view
+  end
+
   opts.on("-g", "--genconfig", "Create a default configuration file.") do
     config[:action] = :configure
   end
@@ -54,19 +58,34 @@ optparse = OptionParser.new { |opts|
 }
 optparse.parse!
 
+config[:action]    = :post if ARGV.size > 0 and config[:action].nil?
 config[:resources] = File.expand_path("#{File.dirname(__FILE__)}/../resources")
-config[:action] = :post if ARGV.size > 0 and config[:action].nil?
 
 case config[:action]
 when :stream
   require 'twitterpunch/streamer'
-  client = Twitterpunch::Streamer.new(config)
-  client.stream
+  require 'twitterpunch/viewer'
+
+  statefile      = File.expand_path('~/.twitterpunch.state')
+  config[:state] = YAML.load_file(statefile) rescue {}
+
+  Twitterpunch::Streamer.new(config).thread
+  Twitterpunch::Viewer.new(config)
+
+  File.open(statefile, 'w') {|f| f.write(config[:state].to_yaml) }
 
 when :post
   require 'twitterpunch/poster'
   client = Twitterpunch::Poster.new(config)
   client.post(ARGV)
+
+when :view
+  require 'twitterpunch/viewer'
+
+  statefile      = File.expand_path('~/.twitterpunch.state')
+  config[:state] = YAML.load_file(statefile) rescue {}
+
+  client = Twitterpunch::Viewer.new(config)
 
 when :configure
   require 'twitterpunch/configuration'
@@ -80,3 +99,4 @@ else
   puts "Run twitterpunch --help for usage."
   exit 1
 end
+

@@ -56,6 +56,9 @@ module Twitterpunch
           "I'm a posting fool",
           "minimally viable product"
         ],
+        :viewer    => {
+          :count => 5,
+        },
         :hashtag   => "BestHalloweenPartyEver",
         :handle    => "fassford",
         :photodir  => "~/Pictures/twitterpunch/",
