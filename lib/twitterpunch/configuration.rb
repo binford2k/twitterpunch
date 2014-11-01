@@ -59,10 +59,9 @@ module Twitterpunch
         :viewer    => {
           :count => 5,
         },
-        :hashtag   => "BestHalloweenPartyEver",
-        :handle    => "fassford",
+        :hashtag   => "Twitterpunch",
         :photodir  => "~/Pictures/twitterpunch/",
-        :logfile   => '/var/log/twitterpunch',
+        :logfile   => '~/.twitterpunch.log',
       }
     end
   end

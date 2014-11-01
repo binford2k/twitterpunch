@@ -7,7 +7,7 @@ module Twitterpunch
   class Logger
     def initialize(config)
       @options = config
-      @logger  = ::Logger.new(config[:logfile])
+      @logger  = ::Logger.new(File.expand_path(config[:logfile]))
 
       @logger.level = config[:debug] ? ::Logger::DEBUG : ::Logger::INFO
     end

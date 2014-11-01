@@ -6,34 +6,55 @@ module Twitterpunch
     include Rubygame
     include Sprites::Sprite
 
-    def initialize(dimensions, image, text)
+    def initialize(dimensions, image, text, pop=false)
       # Invoking the base class constructor is important and yet easy to forget:
       super()
 
       @dimensions = dimensions
+      @popped     = pop
+      @text       = text
+      @original   = Surface.load(image)
 
-      @rate = rand(35..150)
-      @zoom = rand(50..100) / 100.0
-
-      # @image and @rect are expected by the Rubygame sprite code
-      @image = Surface.load(image).zoom(@zoom)
+      if pop
+        @image = @original
+        @start = Time.now
+        @stale = 10
+      else
+        @rate  = rand(35..150)
+        @zoom  = rand(50..100) / 100.0
+        @image = @original.zoom(@zoom)
+      end
 
       max_width = dimensions[0] * 0.75
       if @image.width > max_width
-        @image = @image.zoom(max_width/@image.width)
+        factor = max_width/@image.width
+        @original = @original.zoom(factor)
+        @image    = @image.zoom(factor)
       end
 
-      @top  = 0 - @image.height
-      @left = (dimensions[0] - @image.width ) * rand
+      if pop
+        @left = (dimensions[0] - @image.width)  / 2
+        @top  = (dimensions[1] - @image.height) / 2
+      else
+        @left = (dimensions[0] - @image.width ) * rand
+        @top  = 0 - @image.height
+      end
+
       @rect = @image.make_rect
 
-      if text
-        @text = $font.render_utf8(text, true, Color[:black], Color[:gray])
-        @text.alpha = 150
+      render_text
+    end
+
+    def render_text
+      if @text
+        text = $font.render_utf8(@text, true, Color[:black], Color[:gray])
+
+        # for some reason, windows doesn't deal with this properly
+        text.alpha = 150 unless RUBY_PLATFORM =~ /mingw|cygwin/
 
         # Determine the dimensions in pixels of the area used to render the text.  The
         # "topleft" of the returned rectangle is at [ 0, 0]
-        rt = @text.make_rect
+        rt = text.make_rect
 
         # Re-use the "topleft" of the rectangle to indicate where the text should
         # appear on screen ( lower left corner )
@@ -41,16 +62,34 @@ module Twitterpunch
         rt.topleft = [ 0, @image.height - rt.height]
 
         # Copy the pixels of the rendered text to the image
-        @text.blit(@image, rt)
+        text.blit(@image, rt)
       end
     end
 
-    # Animate this object.  "seconds_passed" contains the number of ( real-world)
+    # Animate this object.  "seconds_passed" contains the number of real-world
     # seconds that have passed since the last time this object was updated and is
-    # therefore useful for working out how far the object should move ( which
+    # therefore useful for working out how far the object should move (which
     # should be independent of the frame rate)
     def update(seconds_passed)
-      @top += seconds_passed * @rate
+      if @popped
+        elapsed = (Time.now - @start).to_f
+
+        if elapsed < 1
+          scale = 1 + damped_sin(elapsed, 4, 0.05)
+
+          @image = @original.zoom(scale)
+          @top  *= scale
+          @left *= scale
+
+          # We changed image size, so rebuild the rect and draw new text
+          @rect = @image.make_rect
+          render_text
+        elsif elapsed > @stale
+          @image.alpha -= 5
+        end
+      else
+        @top += seconds_passed * @rate
+      end
       @rect.topleft = [ @left, @top ]
     end
 
@@ -59,7 +98,19 @@ module Twitterpunch
     end
 
     def visible
-      @top < @dimensions[1]
+      if @popped
+        @image.alpha > 0
+      else
+        @top < @dimensions[1]
+      end
+    end
+
+    def damped_sin(input, cycles = 4, scale = 1)
+      Math.sin(input * cycles * Math::PI) * (1 - input) * scale
+    end
+
+    def popped?
+      return @popped
     end
   end
 end

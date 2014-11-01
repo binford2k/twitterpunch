@@ -12,6 +12,8 @@ module Twitterpunch
       @client = Twitter::Streaming::Client.new(config[:twitter])
       @logger = Twitterpunch::Logger.new(config)
       @output = File.expand_path(config[:photodir])
+      @handle = Twitter::REST::Client.new(config[:twitter]).current_user.screen_name
+      @viewer = config[:display]
 
       FileUtils.mkdir_p(@output) unless File.directory?(@output)
     end
@@ -31,18 +33,6 @@ module Twitterpunch
 
             content = tweet.text.gsub(/ http\S*/,'').gsub(/#\S*/,'')
 
-
-            unless tweet.user.screen_name == @config[:handle]
-              message = "#{tweet.user.name} says #{content}"
-
-              case RUBY_PLATFORM
-              when /mingw|cygwin/
-                system('cscript', "#{@config[:resources]}/say.vbs", message)
-              when /darwin/
-                system('say', message)
-              end
-            end
-
             if tweet.media?
               uri      = tweet.media.first.media_uri
 
@@ -56,16 +46,33 @@ module Twitterpunch
                 file.write(response.body)
               end
 
-              unless tweet.user.screen_name == @config[:handle]
+              unless tweet.user.screen_name == @handle
                 @config[:state][image] = content
               end
 
-              # OS X screensaver doesn't reload images dynamically. This kinda sucks.
-              if RUBY_PLATFORM =~ /darwin/ and not @config.has_key? :viewer
-                system('osascript', '-e', 'tell application "System Events" to stop current screen saver')
-                system('osascript', '-e', 'tell application "System Events" to start current screen saver')
+              if @viewer
+                @viewer.pop(image, content)
+              else
+                # OS X screensaver doesn't reload images dynamically. This kinda sucks.
+                if RUBY_PLATFORM =~ /darwin/ and system('pgrep ScreenSaverEngine >/dev/null')
+                  system('osascript', '-e', 'tell application "System Events" to stop current screen saver')
+                  system('osascript', '-e', 'tell application "System Events" to start current screen saver')
+                end
+              end
+
+            end
+
+            unless tweet.user.screen_name == @handle
+              message = "#{tweet.user.name} says #{content}"
+
+              case RUBY_PLATFORM
+              when /mingw|cygwin/
+                system('cscript', "#{@config[:resources]}/say.vbs", message)
+              when /darwin/
+                system('say', message)
               end
             end
+
           end
         end
       rescue Interrupt => e

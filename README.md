@@ -17,20 +17,20 @@ Configure the program via the `~/.twitterpunch.yaml` YAML file. This file should
 look similar to the example below.
 
     ---
-    :twitter:
+    :twitter:                               # twitter configuration
       :consumer_key: <consumer key>
       :consumer_secret: <consumer secret>
       :access_token: <access token>
       :access_token_secret: <access secret>
-    :messages:
-    - Hello there
+    :messages:                              # list of messages to attach
+    - Hello there                           # to outgoing tweets
     - I'm a posting fool
     - minimally viable product
-    :hashtag: BestHalloweenPartyEver
-    :handle: FassFord
-    :photodir: ~/Pictures/twitterpunch/
-    :logfile: /Users/ben/.twitterpunch.log
-    :sendsound: /System/Library/PrivateFrameworks/ToneLibrary.framework/Versions/A/Resources/AlertTones/tweet_sent.caf
+    :hashtag: Twitterpunch                  # The hashtag to post and listen to
+    :photodir: ~/Pictures/twitterpunch/     # Where to save downloaded images
+    :logfile: ~/.twitterpunch.log           # Where to save logs
+    :viewer:                                # Use the built-in slideshow viewer
+      :count: 5                             # How many images to have onscreen at once
 
 A skeleton configuration file, with access tokens from Twitter, can be generated
 by running the program with the `--genconfig` flag.
@@ -71,13 +71,17 @@ multiple files at once.
 
 ### Viewing the Twitter stream
 
-Currently Twitterpunch doesn't display photos directly. It simply downloads them
-and stuffs them into the configured `:photodir`. Twitterpunch will run on OS X or
-Windows equally well. Simply configure it on the computer that will act as the 
-Twitter display and then run in streaming mode. Tweets that come from any other
-user will be spoken aloud.
+Twitterpunch will run on OS X or Windows equally well. Simply configure it on the
+computer that will act as the Twitter display and then run in streaming mode.
+All images tweeted to the configured hashtag will be displayed in the slideshow
+and tweets that come from any other user will also be spoken aloud.
 
     [ben@ganymede] ~ $ twitterpunch --stream
+
+If you don't want to use the built-in slideshow viewer, you can disable it by
+removing the `:viewer` key from your `~/.twitterpunch.yaml` config file. Twitterpunch
+will then simply download the tweeted images and save them into the `:photodir`
+directory. You can then use anything you like to view them.
 
 There are currently two decent viewing options I am aware of.
 
@@ -98,7 +102,7 @@ Limitations
 ===========
 
 * It currently requires manual setup for Folder Actions.
-* It currently requires an external viewer, such as a screensaver.
+* Rubygame is kind of a pain to set up.
 
 
 Contact

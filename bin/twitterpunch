@@ -66,11 +66,14 @@ when :stream
   require 'twitterpunch/streamer'
   require 'twitterpunch/viewer'
 
-  statefile      = File.expand_path('~/.twitterpunch.state')
-  config[:state] = YAML.load_file(statefile) rescue {}
+  statefile = File.expand_path('~/.twitterpunch.state')
+  viewer    = Twitterpunch::Viewer.new(config)
+
+  config[:state]   = YAML.load_file(statefile) rescue {}
+  config[:display] = viewer
 
   Twitterpunch::Streamer.new(config).thread
-  Twitterpunch::Viewer.new(config)
+  viewer.run
 
   File.open(statefile, 'w') {|f| f.write(config[:state].to_yaml) }
 
@@ -85,7 +88,8 @@ when :view
   statefile      = File.expand_path('~/.twitterpunch.state')
   config[:state] = YAML.load_file(statefile) rescue {}
 
-  client = Twitterpunch::Viewer.new(config)
+  viewer = Twitterpunch::Viewer.new(config)
+  viewer.run
 
 when :configure
   require 'twitterpunch/configuration'
