@@ -9,11 +9,20 @@ module Twitterpunch
   class Streamer
     def initialize(config)
       @config = config
+      @viewer = config[:display]
       @client = Twitter::Streaming::Client.new(config[:twitter])
       @logger = Twitterpunch::Logger.new(config)
       @output = File.expand_path(config[:photodir])
-      @handle = Twitter::REST::Client.new(config[:twitter]).current_user.screen_name
-      @viewer = config[:display]
+
+      begin
+        @handle = Twitter::REST::Client.new(config[:twitter]).current_user.screen_name
+      rescue Twitter::Error => e
+        puts "Cannot retrieve Twitter username."
+        puts "It's likely that you're on Windows and your SSL environment isn't complete"
+        puts "Download http://curl.haxx.se/ca/cacert.pem and set the environment variable"
+        puts "SSL_CERT_FILE to point to it."
+        puts e.message
+      end
 
       FileUtils.mkdir_p(@output) unless File.directory?(@output)
     end
