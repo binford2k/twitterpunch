@@ -8,17 +8,9 @@ module Twitterpunch
     def initialize(file)
       @configfile = file
 
-      puts "Set up your application at https://twitter.com/apps/"
-      puts "then enter your 'Consumer key' and 'Consumer secret':"
-
-      print "Consumer key: "
-      @consumer_key = STDIN.readline.chomp
-      print "Consumer secret: "
-      @consumer_secret = STDIN.readline.chomp
-
       consumer = OAuth::Consumer.new(
-        @consumer_key,
-        @consumer_secret,
+        Twitterpunch::API_KEY,
+        Twitterpunch::API_SECRET,
         {
           :site   => 'https://api.twitter.com/',
           :scheme => :header,
@@ -26,7 +18,8 @@ module Twitterpunch
 
       request_token = consumer.get_request_token
 
-      puts "Visit #{request_token.authorize_url} in your browser to authorize the app"
+      puts 'Please authorize Twitterpunch to post to your Twitter account.'
+      puts "Visit #{request_token.authorize_url} in your browser."
       # if we're on a Mac, open the page automatically
       system("open #{request_token.authorize_url} 2>/dev/null")
 
@@ -40,10 +33,10 @@ module Twitterpunch
       config = YAML.load_file(@configfile) rescue defaults
 
       config[:twitter] = {
-        :consumer_key        => "#{@consumer_key}",
-        :consumer_secret     => "#{@consumer_secret}",
-        :access_token        => "#{@access_token.token}",
-        :access_token_secret => "#{@access_token.secret}"
+        :consumer_key        => Twitterpunch::API_KEY,
+        :consumer_secret     => Twitterpunch::API_SECRET,
+        :access_token        => @access_token.token,
+        :access_token_secret => @access_token.secret
       }
 
       File.open(@configfile, 'w') {|f| f.write(config.to_yaml) }

@@ -12,19 +12,19 @@ configfile = File.expand_path('~/.twitterpunch.yaml')
 config     = YAML.load_file(configfile) rescue {}
 
 optparse = OptionParser.new { |opts|
-  opts.banner = "Usage : twitterpunch [--debug] [--stream] [--install] [--version] [filename]
+  opts.banner = "Usage : twitterpunch [options] [filename]
 
     Twitterpunch is designed to work with PhotoBooth and OS X Folder Actions.
     When this script is called with the name of an image file, it will post the
     image to Twitter, along with a randomly chosen message and a hashtag.
 
     If you call the script with the --stream argument instead, it will listen
-    for tweets to that hashtag and download them to a specified directory. If
-    the tweet came from another user, Twitterpunch will speak it aloud.
+    for tweets to that hashtag and display them in a slideshow. If the tweet
+    came from another user, Twitterpunch will speak it aloud.
 
 "
 
-  opts.on("-d", "--debug", "Choose an alternate provisioning backend.") do
+  opts.on("-d", "--debug", "Display extra debugging information.") do
     config[:debug] = true
   end
 
@@ -32,11 +32,15 @@ optparse = OptionParser.new { |opts|
     config[:action] = :stream
   end
 
-  opts.on("--view", "Run photo viewer only.") do
+  opts.on("--view", "Run photo slideshow viewer only.") do
     config[:action] = :view
   end
 
-  opts.on("-g", "--genconfig", "Create a default configuration file.") do
+  opts.on("-a", "--authorize", "Authorize Twitterpunch with Twitter and write out a configuration file.") do
+    config[:action] = :configure
+  end
+  opts.on("-g", "--genconfig", "Deprecated config generation. Use --authorize instead.") do
+    puts 'NOTICE: [-g|--genconfig\ are deprecated. Please use --authorize instead'
     config[:action] = :configure
   end
 

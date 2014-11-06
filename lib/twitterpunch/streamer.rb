@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'yaml'
 require 'twitter'
-require "net/http"
+require 'net/http'
 
 require 'twitterpunch/logger'
 
