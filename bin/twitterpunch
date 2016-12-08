@@ -4,9 +4,13 @@ require 'rubygems'
 require 'twitter'
 require 'optparse'
 require "net/http"
+require 'fileutils'
 require 'yaml'
 
 require 'twitterpunch'
+
+FileUtils.mkdir_p File.expand_path('~/.twitterpunch')
+FileUtils.touch(File.expand_path('~/.twitterpunch/queue.yaml'))
 
 configfile = File.expand_path('~/.twitterpunch.yaml')
 config     = YAML.load_file(configfile) rescue {}
@@ -44,7 +48,11 @@ optparse = OptionParser.new { |opts|
     config[:action] = :configure
   end
 
-  opts.on("-i", "--install", "Install the Folder Action workflow (OS X only).") do
+  opts.on("-i", "--remote", "Start the Twitterpunch remote web service") do
+    config[:action] = :remote
+  end
+
+  opts.on("-r", "--install", "Install the Folder Action workflow (OS X only).") do
     config[:action] = :install
   end
 
@@ -102,6 +110,15 @@ when :configure
 
 when :install
   system('open', "#{config[:resources]}/Twitterpunch.workflow")
+
+when :remote
+  require 'twitterpunch/remote'
+  options = {
+    :port => 8080,
+    :bind => '0.0.0.0',
+  }
+
+  Twitterpunch::Remote.run! options
 
 else
   puts "Run twitterpunch --help for usage."

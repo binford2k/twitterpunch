@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.files            += Dir.glob("lib/**/*")
   s.files            += Dir.glob("bin/**/*")
   s.files            += Dir.glob("resources/**/*")
+  s.files            += Dir.glob("views/**/*")
 
   s.add_dependency      "twitter"
   s.add_dependency      "oauth"

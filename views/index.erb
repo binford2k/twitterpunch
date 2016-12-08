@@ -1,0 +1,99 @@
+<html>
+	<head>
+  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+		<title>Twitterpunch Remote</title>
+		<style>
+  		body {
+    		background-color: black;
+    		width: 100%;
+    		margin: 0;
+    		padding: 0;
+  		}
+  		#message {
+    		width: 96%;
+    		margin: 2%;
+    		font-size: 16px;
+  		}
+  	  input[type=button] {
+    	  -webkit-appearance: none;
+    	  width: 96%;
+    	  height: 96%;
+    	  margin: 2%;
+    	  padding: 3px;
+    	  border: 6px solid #ccc;
+    	  border-radius: 32px;
+        font-size: 112pt;
+        font-weight: bolder;
+        background-color: #5e5959;
+  	  }
+  	  input.active {
+    	  font-size: 92pt;
+    	  color: white;
+        background-color: #5e2524;
+  	  }
+      @media screen and (max-width: 425px) and (orientation:portrait) {
+        #message {
+          height: 15%;
+        }
+  	    input[type=button] {
+  	      height: 80%;
+  	      word-wrap: break-word;
+  	      word-break: break-word;
+  	    }
+        input.active {
+    	    font-size: 64pt;
+        }
+      }
+      @media screen and (max-width: 800px) and (orientation:landscape) {
+        #message {
+          height: 10%;
+        }
+  	    input[type=button] {
+  	      height: 76%;
+  	    }
+      }
+    </style>
+		<script type="text/javascript">
+  	  function get(url, callback) {
+    	  var xmlHttp = new XMLHttpRequest();
+    	  xmlHttp.onreadystatechange = function() {
+      	  if (xmlHttp.readyState == 4) {
+      	    if(xmlHttp.status == 200) {
+          	  if(typeof(callback) == 'function') {
+          	    callback(xmlHttp.responseText);
+          	  }
+        	  }
+        	  else {
+          	  console.log(xmlHttp.responseText);
+        	  }
+      	  }
+    	  }
+    	  xmlHttp.open("GET", url, true);
+    	  xmlHttp.send(null);
+  	  }
+  	  function activate() {
+    	  var txt = document.getElementById("message").value;
+    	  var btn = document.getElementById("btn");
+    	  btn.className = "active";
+    	  btn.value     = "Say Cheese!";
+
+    	  setTimeout(function(){
+      	  btn.className = "";
+      	  btn.value     ="Push Me";
+        },3000);
+
+        if(txt == "") {
+          get('/photo');
+        }
+        else {
+          get('/photo?message='+txt);
+        }
+  	  }
+    </script>
+	</head>
+	<body>
+  	<textarea id="message" placeholder="Enter a message if you like..."></textarea>
+		<input type="button" id="btn" value="Push Me" onClick="javascript:activate();" />
+	</body>
+</html>
