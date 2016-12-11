@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'twitter'
+require 'twitterpunch/queue'
 
 module Twitterpunch
   class Poster
@@ -8,26 +9,16 @@ module Twitterpunch
       @client = Twitter::REST::Client.new(config[:twitter])
       @sound  = @config[:sendsound] || "#{@config[:resources]}/tweet_sent.wav"
       @length = 113 - @config[:hashtag].length
+      @queue  = Twitterpunch::Queue.new(config)
     end
 
     def post(files)
-      File.open(File.expand_path('~/.twitterpunch/queue.yaml'), 'r+') do |file|
-        file.flock(File::LOCK_EX)
+      files.each do |img|
+        message = @queue.pop || @config[:messages].sample
+        message = "#{message[0..@length]} ##{@config[:hashtag]}"
 
-        queue   = YAML.load(file.read) rescue []
-        queue ||= []
-
-        files.each do |img|
-          message = queue.shift || @config[:messages].sample
-          message = "#{message[0..@length]} ##{@config[:hashtag]}"
-
-          @client.update_with_media(message, File.new(File.expand_path(img)))
-          chirp()
-        end
-
-        file.rewind
-        file.truncate 0
-        file.write(queue.to_yaml)
+        @client.update_with_media(message, File.new(File.expand_path(img)))
+        chirp()
       end
     end
 

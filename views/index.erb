@@ -1,99 +1,147 @@
 <html>
-	<head>
-  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-		<title>Twitterpunch Remote</title>
-		<style>
-  		body {
-    		background-color: black;
-    		width: 100%;
-    		margin: 0;
-    		padding: 0;
-  		}
-  		#message {
-    		width: 96%;
-    		margin: 2%;
-    		font-size: 16px;
-  		}
-  	  input[type=button] {
-    	  -webkit-appearance: none;
-    	  width: 96%;
-    	  height: 96%;
-    	  margin: 2%;
-    	  padding: 3px;
-    	  border: 6px solid #ccc;
-    	  border-radius: 32px;
-        font-size: 112pt;
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Twitterpunch" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" sizes="120x120" href="touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad-retina.png">
+    <title>Twitterpunch Remote</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        background-color: black;
+      }
+      #message {
+        flex: 1;
+        font-size: 16px;
+      }
+      input[type=button] {
+        flex: 4;
+        margin: 5px;
+        padding: 0;
+        font-size: 104pt;
         font-weight: bolder;
         background-color: #5e5959;
-  	  }
-  	  input.active {
-    	  font-size: 92pt;
-    	  color: white;
+        border: 6px solid #ccc;
+        border-radius: 32px;
+        white-space:normal;
+        -webkit-appearance: none;
+      }
+      input.active {
+        color: white;
+        font-size: 64pt;
         background-color: #5e2524;
-  	  }
-      @media screen and (max-width: 425px) and (orientation:portrait) {
-        #message {
-          height: 15%;
+      }
+      body.focused #message {
+        flex: 2;
+      }
+      body.focused input[type=button] {
+        flex: 3;
+        margin-bottom: 325px;
+        font-size: 64pt;
+      }
+
+      @media screen and (max-width: 370px) and (orientation:portrait) {
+        input[type=button] {
+          font-size: 64pt;
         }
-  	    input[type=button] {
-  	      height: 80%;
-  	      word-wrap: break-word;
-  	      word-break: break-word;
-  	    }
         input.active {
-    	    font-size: 64pt;
+          font-size: 52pt;
+        }
+        body.focused #message {
+          flex: 6;
+        }
+        body.focused input[type=button] {
+          flex: 4;
+          margin-bottom: 250px;
+          font-size: 20pt;
+          border-radius: 6px;
+          padding: 0;
         }
       }
-      @media screen and (max-width: 800px) and (orientation:landscape) {
-        #message {
-          height: 10%;
+      @media screen and (max-width: 650px) and (orientation:landscape) {
+        input[type=button] {
+          font-size: 84pt;
         }
-  	    input[type=button] {
-  	      height: 76%;
-  	    }
+        input.active {
+          font-size: 56pt;
+        }
       }
     </style>
-		<script type="text/javascript">
-  	  function get(url, callback) {
-    	  var xmlHttp = new XMLHttpRequest();
-    	  xmlHttp.onreadystatechange = function() {
-      	  if (xmlHttp.readyState == 4) {
-      	    if(xmlHttp.status == 200) {
-          	  if(typeof(callback) == 'function') {
-          	    callback(xmlHttp.responseText);
-          	  }
-        	  }
-        	  else {
-          	  console.log(xmlHttp.responseText);
-        	  }
-      	  }
-    	  }
-    	  xmlHttp.open("GET", url, true);
-    	  xmlHttp.send(null);
-  	  }
-  	  function activate() {
-    	  var txt = document.getElementById("message").value;
-    	  var btn = document.getElementById("btn");
-    	  btn.className = "active";
-    	  btn.value     = "Say Cheese!";
+    <script type="text/javascript">
+      function get(url, callback) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+          if (xmlHttp.readyState == 4) {
+            if(xmlHttp.status == 200) {
+              if(typeof(callback) == 'function') {
+                callback(xmlHttp.responseText);
+              }
+            }
+            else {
+              console.log(xmlHttp.responseText);
+            }
+          }
+        }
+        xmlHttp.open("GET", url, true);
+        xmlHttp.send(null);
+      }
+      function activate() {
+        var msg = document.getElementById("message");
+        var btn = document.getElementById("btn");
+        var txt = msg.value;
+        btn.className = "active";
+        btn.value     = "Say Cheese!";
 
-    	  setTimeout(function(){
-      	  btn.className = "";
-      	  btn.value     ="Push Me";
+        setTimeout(function(){
+          btn.className = "";
+          btn.value     = "Push Me";
+          msg.value     = "";
         },3000);
 
-        if(txt == "") {
+        if (txt == "") {
           get('/photo');
         }
         else {
           get('/photo?message='+txt);
         }
-  	  }
+      }
+      function shrink() {
+        var body = document.getElementsByTagName("body")[0];
+        body.className = "focused";
+      }
+      function expand() {
+        var body = document.getElementsByTagName("body")[0];
+        body.className = "";
+      }
     </script>
-	</head>
-	<body>
-  	<textarea id="message" placeholder="Enter a message if you like..."></textarea>
-		<input type="button" id="btn" value="Push Me" onClick="javascript:activate();" />
-	</body>
+  </head>
+  <body>
+    <textarea id="message" class="item" placeholder="Enter a message if you like..." onclick="shrink()" onblur="expand()"></textarea>
+    <input type="button" id="btn" class="item" value="Push Me" onClick="activate()" />
+  </body>
+  <script>
+    // really truly disable the shit out of pinch-to-zoom
+    var lastTouchEnd = 0;
+    document.documentElement.addEventListener('touchend', function (event) {
+      var now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    document.documentElement.addEventListener('touchstart', function (event) {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    }, false);
+  </script>
 </html>

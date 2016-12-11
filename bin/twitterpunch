@@ -56,6 +56,10 @@ optparse = OptionParser.new { |opts|
     config[:action] = :install
   end
 
+  opts.on("-t", "--test", "Load up Pry debugging console.") do
+    config[:action] = :test
+  end
+
   opts.on("-v", "--version", "Display version information.") do
     puts "Twitterpunch v#{Twitterpunch::VERSION}"
     exit 0
@@ -70,8 +74,11 @@ optparse = OptionParser.new { |opts|
 }
 optparse.parse!
 
-config[:action]    = :post if ARGV.size > 0 and config[:action].nil?
-config[:resources] = File.expand_path("#{File.dirname(__FILE__)}/../resources")
+config[:action]       = :post if ARGV.size > 0 and config[:action].nil?
+config[:resources]    = File.expand_path("#{File.dirname(__FILE__)}/../resources")
+config[:queue]        = {}
+config[:queue][:file] = File.expand_path('~/.twitterpunch/queue.yaml')
+config[:queue][:ttl]  = 30
 
 case config[:action]
 when :stream
@@ -114,11 +121,16 @@ when :install
 when :remote
   require 'twitterpunch/remote'
   options = {
-    :port => 8080,
-    :bind => '0.0.0.0',
+    :port  => 8080,
+    :bind  => '0.0.0.0',
+    :queue => Twitterpunch::Queue.new(config),
   }
 
   Twitterpunch::Remote.run! options
+
+when :test
+  require 'pry'
+  binding.pry
 
 else
   puts "Run twitterpunch --help for usage."

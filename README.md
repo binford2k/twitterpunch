@@ -98,6 +98,13 @@ There are currently two decent viewing options I am aware of.
     * Drawbacks: The screensaver doesn't reload dynamically, so I have to kick it
       and you'll see it reloading each time a new tweet comes in.
 
+### Running the remote web app
+
+1. Run the app with `twitterpunch --remote`
+1. Browse to the app with http://<address>:8080
+1. [optional] If on an iOS device, add to your homescreen
+    * This will give you "app behaviour", such as full screen, and a nice icon
+
 Limitations
 ===========
 
