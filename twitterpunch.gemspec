@@ -7,7 +7,8 @@ Gem::Specification.new do |s|
   s.version           = Twitterpunch::VERSION
   s.date              = Date.today.to_s
   s.summary           = "A simple tool to automate the posting and streaming of PhotoBooth shots over Twitter."
-  s.homepage          = "http://binford2k.com"
+  s.homepage          = "https://github.com/binford2k/twitterpunch"
+  s.license           = 'MIT'
   s.email             = "binford2k@gmail.com"
   s.authors           = ["Ben Ford"]
   s.has_rdoc          = false
