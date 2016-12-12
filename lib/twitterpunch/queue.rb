@@ -45,7 +45,6 @@ class Twitterpunch::Queue
   end
 
   def save(file, queue)
-    puts "Saving #{queue.inspect}"
     file.rewind
     file.truncate 0
     file.write(queue.to_yaml)

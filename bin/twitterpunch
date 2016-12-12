@@ -10,9 +10,8 @@ require 'yaml'
 require 'twitterpunch'
 
 FileUtils.mkdir_p File.expand_path('~/.twitterpunch')
-FileUtils.touch(File.expand_path('~/.twitterpunch/queue.yaml'))
 
-configfile = File.expand_path('~/.twitterpunch.yaml')
+configfile = File.expand_path('~/.twitterpunch/config.yaml')
 config     = YAML.load_file(configfile) rescue {}
 
 optparse = OptionParser.new { |opts|
@@ -40,11 +39,10 @@ optparse = OptionParser.new { |opts|
     config[:action] = :view
   end
 
-  opts.on("-a", "--authorize", "Authorize Twitterpunch with Twitter and write out a configuration file.") do
-    config[:action] = :configure
+  opts.on("--authorize", "Authorize Twitterpunch with Twitter and update the configuration file.") do
+    config[:action] = :authorize
   end
-  opts.on("-g", "--genconfig", "Deprecated config generation. Use --authorize instead.") do
-    puts 'NOTICE: [-g|--genconfig\ are deprecated. Please use --authorize instead'
+  opts.on("--configure", "Generate default configuration (other than Twitter authorization).") do
     config[:action] = :configure
   end
 
@@ -76,19 +74,22 @@ optparse.parse!
 
 config[:action]       = :post if ARGV.size > 0 and config[:action].nil?
 config[:resources]    = File.expand_path("#{File.dirname(__FILE__)}/../resources")
+config[:statefile]    = File.expand_path('~/.twitterpunch/state.yaml')
 config[:queue]        = {}
 config[:queue][:file] = File.expand_path('~/.twitterpunch/queue.yaml')
 config[:queue][:ttl]  = 30
+
+FileUtils.touch(config[:queue][:file])
+FileUtils.touch(config[:statefile])
 
 case config[:action]
 when :stream
   require 'twitterpunch/streamer'
   require 'twitterpunch/viewer'
 
-  statefile = File.expand_path('~/.twitterpunch.state')
-  viewer    = Twitterpunch::Viewer.new(config)
+  viewer = Twitterpunch::Viewer.new(config)
 
-  config[:state]   = YAML.load_file(statefile) rescue {}
+  config[:state]   = YAML.load_file(config[:statefile]) rescue {}
   config[:display] = viewer
 
   Twitterpunch::Streamer.new(config).thread
@@ -104,16 +105,22 @@ when :post
 when :view
   require 'twitterpunch/viewer'
 
-  statefile      = File.expand_path('~/.twitterpunch.state')
-  config[:state] = YAML.load_file(statefile) rescue {}
+  config[:state] = YAML.load_file(config[:statefile]) rescue {}
 
   viewer = Twitterpunch::Viewer.new(config)
   viewer.run
 
+when :authorize
+  require 'twitterpunch/configuration'
+  cfg = Twitterpunch::Configuration.new(configfile)
+  cfg.authorize
+  cfg.save
+
 when :configure
   require 'twitterpunch/configuration'
-  cfg = Twitterpunch::Configuration.new(configfile).save
-  puts "Please edit #{configfile} to configure."
+  cfg = Twitterpunch::Configuration.new(configfile)
+  cfg.configure
+  cfg.save
 
 when :install
   system('open', "#{config[:resources]}/Twitterpunch.workflow")
