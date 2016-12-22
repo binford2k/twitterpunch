@@ -95,7 +95,7 @@ when :stream
   Twitterpunch::Streamer.new(config).thread
   viewer.run
 
-  File.open(statefile, 'w') {|f| f.write(config[:state].to_yaml) }
+  File.open(config[:statefile], 'w') {|f| f.write(config[:state].to_yaml) }
 
 when :post
   require 'twitterpunch/poster'
