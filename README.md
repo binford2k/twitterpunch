@@ -59,6 +59,16 @@ Usage
 1. Profit!
     * _and by that, I mean take some shots with PhotoBooth!_
 
+*Note*: if the folder action doesn't seem to work and photos aren't posted to
+Twitter, here are some troubleshooting steps to take:
+
+1. Run Twitterpunch by hand with photos as arguments. This may help you isolate
+   configuration or authorization issues.
+    * `twitterpunch foo.jpg`
+1. Correct the path in the workflow.
+    * `which twitterpunch`
+    * Edit the Twitterpunch folder action to include that path.
+    
 #### Using the remote web app
 
 1. Run the app with `twitterpunch --remote`
