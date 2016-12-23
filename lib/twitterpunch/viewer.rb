@@ -105,7 +105,7 @@ module Twitterpunch
 
     def next_image
       image = Dir.glob(File.expand_path("#{@config[:photodir]}/*")).sample
-      text  = @config[:state][File.basename(image)]
+      text  = @config[:state][File.basename(image)] rescue nil
       return image, text
     end
 
