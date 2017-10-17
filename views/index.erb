@@ -104,7 +104,7 @@
           btn.className = "";
           btn.value     = "Push Me";
           msg.value     = "";
-        },3000);
+        }, <%= settings.remote[:timeout] * 1000 %>);
 
         if (txt == "") {
           get('/photo');

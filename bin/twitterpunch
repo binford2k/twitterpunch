@@ -79,6 +79,12 @@ config[:queue]        = {}
 config[:queue][:file] = File.expand_path('~/.twitterpunch/queue.yaml')
 config[:queue][:ttl]  = 30
 
+config[:remote]              ||= {}
+config[:remote][:port]       ||= 8080
+config[:remote][:timeout]    ||= 3
+config[:remote][:apptitle]   ||= 'Photo Booth'
+config[:remote][:hotkey]     ||= 'return'
+
 FileUtils.touch(config[:queue][:file])
 FileUtils.touch(config[:statefile])
 
@@ -128,9 +134,10 @@ when :install
 when :remote
   require 'twitterpunch/remote'
   options = {
-    :port  => 8080,
-    :bind  => '0.0.0.0',
-    :queue => Twitterpunch::Queue.new(config),
+    :port   => config[:remote][:port],
+    :bind   => '0.0.0.0',
+    :queue  => Twitterpunch::Queue.new(config),
+    :remote => config[:remote],
   }
 
   Twitterpunch::Remote.run! options
