@@ -46,11 +46,11 @@ optparse = OptionParser.new { |opts|
     config[:action] = :configure
   end
 
-  opts.on("-i", "--remote", "Start the Twitterpunch remote web service") do
+  opts.on("-r", "--remote", "Start the Twitterpunch remote web service") do
     config[:action] = :remote
   end
 
-  opts.on("-r", "--install", "Install the Folder Action workflow (OS X only).") do
+  opts.on("-i", "--install", "Install the Folder Action workflow (OS X only).") do
     config[:action] = :install
   end
 
