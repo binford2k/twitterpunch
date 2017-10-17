@@ -38,6 +38,10 @@ should look similar to the example below.
     :logfile: ~/.twitterpunch/activity.log  # Where to save logs
     :viewer:                                # Use the built-in slideshow viewer
       :count: 5                             # How many images to have onscreen at once
+    :remote:
+      :timeout: 45                          # How long the button should remain disabled for
+      :apptitle: dslrBooth                  # The photo booth application title
+      :hotkey: space                        # Which hotkey to send to trigger a photo
 
 1. Generate a skeleton configuration file
     * `twitterpunch --configure`
@@ -68,13 +72,31 @@ Twitter, here are some troubleshooting steps to take:
 1. Correct the path in the workflow.
     * `which twitterpunch`
     * Edit the Twitterpunch folder action to include that path.
-    
+
 #### Using the remote web app
+
+Configure the remote web app using the `:remote` hash in `config.yaml`. You can
+usually find the title of the app using `system_profiler -detailLevel full SPApplicationsDataType`
+and grepping for the name or path to the `.app`.
+
+In this example, the title is _dslrBooth_.
+
+    [ben@ganymede] ~ $ system_profiler -detailLevel full SPApplicationsDataType | grep -B8 dslrBooth.app
+        dslrBooth:
+
+          Version: 2.9
+          Obtained from: Identified Developer
+          Last Modified: 10/14/17, 9:50 PM
+          Kind: Intel
+          64-Bit (Intel): Yes
+          Signed by: Developer ID Application: Hope Pictures LLC (MZR5GHAQX4), Developer ID Certification Authority, Apple Root CA
+          Location: /Applications/dslrBooth.app
 
 1. Run the app with `twitterpunch --remote`
 1. Browse to the app with http://{address}:8080
 1. [optional] If on an iOS device, add to your homescreen
     * This will give you "app behaviour", such as full screen, and a nice icon
+
 
 #### Troubleshooting.
 
@@ -99,6 +121,12 @@ multiple files at once.
 
     [ben@ganymede] ~ $ twitterpunch photo.jpg [photo2.jpg photo3.jpg photo4.jpg]
 
+You can manually install the Folder Action, or you can follow the automated
+install process after tweaking the workflow slightly.
+
+1. Identify where the app stores the resulting image files.
+1. Edit the Twitterpunch folder action to include that path.
+1. Follow the steps above to install the Folder Action.
 
 ### Viewing the Twitter stream
 
