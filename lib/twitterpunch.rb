@@ -1,5 +1,5 @@
 module Twitterpunch
-  VERSION = '0.0.8'
+  VERSION = '0.0.9'
 
   # Twitter application credentials
   API_KEY    = 'STurW17Tj7HuoZ7dSzS0uSoIP'
