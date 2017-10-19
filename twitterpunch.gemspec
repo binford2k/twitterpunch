@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
   s.add_dependency      "colorize"
   s.add_dependency      "rubygame"
   s.add_dependency      "sinatra"
+  s.add_dependency      "rmagick"
 
   s.description       = File.read(File.join(File.dirname(__FILE__), 'README.md'))
 

@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'twitter'
 require 'twitterpunch/queue'
+require 'tempfile'
+require 'rmagick'
 
 module Twitterpunch
   class Poster
@@ -17,8 +19,35 @@ module Twitterpunch
         message = @queue.pop || @config[:messages].sample
         message = "#{message[0..@length]} ##{@config[:hashtag]}"
 
-        @client.update_with_media(message, File.new(File.expand_path(img)))
+        resample(img) do |path|
+          @client.update_with_media(message, File.new(path))
+        end
         chirp()
+      end
+    end
+
+    def resample(img)
+      path = File.expand_path(img)
+      size = File.size?(path)
+      max  = 3000000 # max size for twitter images
+
+      if size < max
+        yield path
+      else
+        # since filesize grows exponentially, this will be smaller than absolutely necessary.
+        ratio   = Float(max) / Float(size)
+        tmpfile = Tempfile.new('twitterpunch')
+
+        image = Magick::Image.read(path).first
+        image.resize!(ratio)
+        image.write(tmpfile.path)
+
+        yield tmpfile.path
+
+        tmpfile.close
+        tmpfile.unlink
+
+        puts "Resized image to #{Integer(ratio * 100)}%."
       end
     end
 
