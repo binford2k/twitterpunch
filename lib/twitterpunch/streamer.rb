@@ -15,7 +15,7 @@ module Twitterpunch
       @output = File.expand_path(config[:photodir])
 
       begin
-        @handle = Twitter::REST::Client.new(config[:twitter]).current_user.screen_name
+        @handle = Twitter::REST::Client.new(config[:twitter]).user.screen_name
       rescue Twitter::Error => e
         puts "Cannot retrieve Twitter username."
         puts "It's likely that you're on Windows and your SSL environment isn't complete"
